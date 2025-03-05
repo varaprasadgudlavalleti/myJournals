@@ -1,0 +1,1 @@
+LIB = $(PWD)/../platforms/$(WM_OPTIONS)/lib/libprghHydrostat1_839b494fa341e145082a44e619d71ae1f6e4072b

@@ -1,0 +1,61 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Change to the directory where the script resides
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Source the OpenFOAM run functions (from the WM_PROJECT_DIR environment variable)
+#------------------------------------------------------------------------------
+# Echo commands to terminal
+set -x                                            # Enable command echoing for debugging
+
+# Duplicate the "0.orig" directory to "0" (setting up initial fields)
+cp -r 0.orig 0
+
+# Run blockMesh to create the mesh based on blockMeshDict
+runApplication blockMesh
+
+# Copy controldict.orig to controldict in the system folder
+cp -r system/controlDict.orig system/controlDict
+
+# Copy controldict.orig to controldict in the system folder
+cp -r system/topoSet_porousDict.orig system/topoSet_porousDict
+
+# Set up the topology for the porous region
+runApplication topoSet -dict system/topoSet_porousDict
+
+# Execute topoSet with a specific dictionary for porous media
+mv ./log.topoSet ./log.topoSet_porous              # Rename the log file for clarity (from log.topoSet to log.topoSet_porous)
+
+
+# Copy controldict.orig to controldict in the system folder
+runApplication setFields
+
+
+
+
+
+
+
+
+
+
+#This will convert the listed cell sets into cell zones and update (or create) the file constant/polyMesh/cellZones (or cellZones.gz).
+#You should now see your porous zones (porous_PE, porous_DI, porous_NE) defined as cell zones.
+# Copy the topoSet dictionary from system folder
+#cp -r system/setsToZonesDict.orig system/setsToZonesDict      # Copy controldict.orig to controldict in the system folder
+
+#runApplication setsToZones
+
+
+# Copy the topoSet dictionary from system folder
+#cp -r system/sampleDict.orig system/sampleDict      # Copy controldict.orig to controldict in the system folder
+
+#runApplication sample
+
+# Set the initial field values
+#runApplication setFields
+
+# Decompose the domain for parallel run
+#runApplication decomposePar -force
+
+#Running case
+#runApplication mpirun -np 4 hisDriftFluxFoam -parallel
+
+#runApplication hisDriftFluxFoam

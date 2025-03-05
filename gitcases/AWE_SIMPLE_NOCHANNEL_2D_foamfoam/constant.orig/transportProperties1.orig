@@ -1,0 +1,424 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//**********************************************************************************************************************//
+PE_setvalue_poredensity						PE_set_PPI;
+PE_setvalue_poresize						PE_set_dp;
+PE_setvalue_tortuosity						PE_set_tau;
+PE_setvalue_specificsurfacearea 			PE_set_ssa;
+PE_setvalue_viscosity						PE_set_mu;
+PE_setvalue_porosity						PE_set_epsilon;
+PE_setvalue_permeability					PE_set_K;
+PE_setvalue_d								PE_set_darcy;
+PE_setvalue_porous_wire_dia					PE_set_wire_d;
+PE_setvalue_porouscell_spacing				PE_set_cellSpacing;
+PE_setvalue_esimatedsherwoodnumber			PE_set_sherwood;
+
+
+
+
+DI_setvalue_poredensity						DI_set_PPI;
+DI_setvalue_poresize						DI_set_dp;
+DI_setvalue_tortuosity						DI_set_tau;
+DI_setvalue_specificsurfacearea 			DI_set_ssa;
+DI_setvalue_viscosity						DI_set_mu;
+DI_setvalue_porosity						DI_set_epsilon;
+DI_setvalue_permeability					DI_set_K;
+DI_setvalue_d								DI_set_darcy;
+DI_setvalue_porous_wire_dia					DI_set_wire_d;
+DI_setvalue_porouscell_spacing				DI_set_cellSpacing;
+DI_setvalue_esimatedsherwoodnumber			DI_set_sherwood;
+
+
+
+NE_setvalue_poredensity						NE_set_PPI;
+NE_setvalue_poresize						NE_set_dp;
+NE_setvalue_tortuosity						NE_set_tau;
+NE_setvalue_specificsurfacearea 			NE_set_ssa;
+NE_setvalue_viscosity						NE_set_mu;
+NE_setvalue_porosity						NE_set_epsilon;
+NE_setvalue_permeability					NE_set_K;
+NE_setvalue_d								NE_set_darcy;
+NE_setvalue_porous_wire_dia					NE_set_wire_d;
+NE_setvalue_porouscell_spacing				NE_set_cellSpacing;
+NE_setvalue_esimatedsherwoodnumber			NE_set_sherwood;
+//**********************************************************************************************************************//
+
+RDB			0.05e-3;
+phases      (gas electrolyte);
+
+gas
+{
+    transportModel  Beckermann;
+
+    rho         0.0645;
+    nud		    1.44e-4;
+    mu		    1e-5;
+
+    //related to diffusion between phases.
+    zeta	1;
+    C_star	1; //rigid spheres
+    Da		0.16;
+    Db		0.81;
+    D1_ref	1.213e-4;//depends on temperature and pressure. needs to be added at some point.
+
+    "(Beckermann|Ishii|linearMu)Coeffs"
+    {
+    mu_ref_H2		    8.411e-6;
+    mu_ref_O2		    1.919e-5;
+    mu_ref_H2O		    9.81e-6;
+
+    T_muref_H2		    273.15;
+    T_muref_O2		    300;	//273.15
+    T_muref_H2O		    300;
+
+    n_mu_H2		    	0.67;
+    n_mu_O2		    	0.754;
+    n_mu_H2O		    1.1;
+
+    //Ishii
+    alpha_crit	    	1;
+    //Beckermann
+    kr		1.25;//BECKKR;
+    }
+}
+
+
+//Dynamic Viscosity (μ ≈ 1.97×10⁻³ Pa·s):For a 30% solution, literature values generally indicate a dynamic viscosity close to 2×10⁻³ Pa·s. The value provided here (1.968×10⁻³ Pa·s)
+// Dynamic viscosity (μ) in Pa·s
+//Density (ρ ≈ 1231 kg/m³): A 30% KOH–water solution typically has a density in the range of about 1230–1250 kg/m³ at room temperature. The value 1231 kg/m³
+// Density (ρ) in kg/m³
+//Kinematic Viscosity (ν ≈ 1.6×10⁻⁶ m²/s): This value is derived from ν = μ/ρ.
+// Kinematic viscosity (ν) in m²/s; note that ν = μ/ρ
+electrolyte
+{
+    	transportModel  Newtonian;
+
+	    mu      2e-3;
+	    rho     1231;
+    	nu      1.6e-6;
+
+}
+
+
+
+
+
+speciesTransport
+{
+	wireModel	constantSherwood;
+
+	"wireModel_generalCoeffs"
+	{
+		a		1.1;   //wireModel_generalCoeffs a = 1.1, b = 0.43, c = 0.33
+		b		0.43;  //These coefficients are typically used in correlations (for example, in a relation like Sh = a + b·Reᶜ) to capture the influence of fluid dynamics on mass transfer.
+		c		0.33;
+
+		d_Pe	$PE_setvalue_porous_wire_dia;//wire diameter
+		d_Ne	$NE_setvalue_porous_wire_dia;//wire diameter
+
+//		d_Ne	2e-05;//wire diameter
+//		d_Pe	2e-05;//wire diameter
+	}
+
+	"wireModel_constantSherwoodCoeffs"
+	{
+//wireModel_constantSherwoodCoeffs: sh_H2, sh_O2, sh_H2O, sh_OH = 1,
+//A constant Sherwood number of 1 for all species implies that the mass transfer coefficient, k, is calculated simply as k= (Sh⋅D)/d with Sh fixed at 1.
+		sh_H2	$PE_setvalue_esimatedsherwoodnumber;
+		sh_O2	$PE_setvalue_esimatedsherwoodnumber;
+		sh_H2O	$PE_setvalue_esimatedsherwoodnumber;
+		sh_OH	$PE_setvalue_esimatedsherwoodnumber;
+
+//		sh_H2	1;
+//		sh_O2	1;
+//		sh_H2O	1;
+//		sh_OH	1;
+
+		d_Pe	$PE_setvalue_porous_wire_dia;//wire diameter
+		d_Ne	$NE_setvalue_porous_wire_dia;//wire diameter
+
+
+//The wire diameter is again specified as 2e-05 m.
+//		d_Ne	2e-05;//wire diameter
+//		d_Pe	2e-05;//wire diameter
+
+	}
+
+}
+
+
+
+
+//1. Attached Bubble Growth Model : This part of the configuration deals with bubbles that are still attached to a surface (such as an electrode).
+
+//sh_H2 = 10 and sh_O2 = 10:
+//For hydrogen and oxygen, a fixed Sherwood number of 10 is assumed. The Sherwood number (Sh) is a dimensionless number that represents the ratio of convective to diffusive mass transfer.
+//A value of 10 suggests an enhancement in mass transfer due to convection at the bubble–electrolyte interface.
+
+
+//sh_H2O = 0; sh_OH = 0:
+//Setting these to zero implies that water and hydroxide are not actively considered in the bubble mass transfer for this specific growth model.
+//This might be because their transfer is negligible compared to the gas-phase species (H₂ and O₂) or is treated elsewhere in the model.
+
+
+//d_Ne and d_Pe (0.05e-3 m):
+//These denote the characteristic diameter for the attached bubble process (typically related to the effective length scale over which mass transfer occurs).
+//The same value is used for both “Ne” and “Pe” (the exact meaning of these suffixes is model-specific; they could refer to different phases or directions).
+
+
+massAndSpeciesTransferModel mixedSaturation;
+"(surfaceSaturation|mixedSaturation|bulkSaturation)Coeffs"
+{
+
+	waterVapour 	true;
+	m_KOH		7.65; //[mol/kg] 7.65-> 30wt%
+
+AttachedBubbleGrowthModel    constantSherwood;
+"AttachedBubbleGrowthModel_constantSherwoodCoeffs"
+{
+    sh_H2	10;
+    sh_O2	10;
+    sh_H2O	0;
+    sh_OH	0;
+
+	d_Pe	$PE_setvalue_porous_wire_dia;//wire diameter
+	d_Ne	$NE_setvalue_porous_wire_dia;//wire diameter
+
+    //d_Ne	0.05e-3;
+    //d_Pe	0.05e-03;
+}
+
+//Coefficients a, b, c: These values are likely used in a correlation of the form: Sh = a + b·Reᶜ or a similar relationship that accounts for the effect of fluid dynamics (via the Reynolds number) on mass transfer.
+//Here, 𝑎 = 1.1 a=1.1 provides a base level of mass transfer, 𝑏 = 0.43 b=0.43 and 𝑐 = 0.33 c=0.33 determine how the Sherwood number increases with the flow conditions.
+//d_Ne and d_Pe: These are again set to 0.05e-3 m, maintaining consistency with the constant Sherwood section.
+"AttachedBubbleGrowthModel_(generalR|general)Coeffs"
+{
+    a	1.1;
+    b	0.43;
+    c	0.33;
+
+
+	d_Pe	$PE_setvalue_porous_wire_dia;//wire diameter
+	d_Ne	$NE_setvalue_porous_wire_dia;//wire diameter
+
+    //d_Ne	0.05e-3;
+    //d_Pe	0.05e-03;
+}
+
+
+
+
+
+//2. Detached Bubble Growth Model: This section applies to bubbles that have detached from the electrode or surface and are now in the bulk of the electrolyte.
+
+//sh_H2 = 1 and sh_O2 = 1: A lower fixed Sherwood number is used for detached bubbles compared to attached ones.
+//This might reflect a less enhanced mass transfer rate once bubbles detach and the convective effects are diminished.
+//d_Ne and d_Pe (0.1e-3 m): The effective diameter is larger (0.1e-3 m) for detached bubbles, reflecting either a larger bubble size or a different characteristic length scale in the detached state.
+DetachedBubbleGrowthModel    constantSherwood;
+"DetachedBubbleGrowthModel_constantSherwoodCoeffs"
+{
+    sh_H2	1;
+    sh_O2	1;
+    sh_H2O	0;
+    sh_OH	0;
+
+    d_Pe	$PE_setvalue_porous_wire_dia;//wire diameter
+	d_Ne	$NE_setvalue_porous_wire_dia;//wire diameter
+
+    //d_Ne	0.1e-3;
+    //d_Pe	0.1e-03;
+}
+
+//Whitaker Correlation for Detached Bubbles
+
+//This block provides parameters for an alternative model based on Whitaker’s approach. In this configuration, only the characteristic lengths are specified.
+//The use of the Whitaker correlation suggests that there is a more refined way to calculate the mass transfer based on dimensionless groups, but here the key length scales remain 0.1e-3 m.
+"DetachedBubbleGrowthModel_(WhitakerR|Whitaker)Coeffs"
+{
+    d_Pe	$PE_setvalue_porous_wire_dia;//wire diameter
+	d_Ne	$NE_setvalue_porous_wire_dia;//wire diameter
+
+    //d_Ne	0.1e-3;
+    //d_Pe	0.1e-03;
+}
+
+
+//Additional Parameters : The final part of the configuration includes time constants and mixing-related parameters:
+
+
+//tau_c = 0.01 and tau_b = 0.1:
+//These represent time constants (in seconds) associated with different processes.
+//For instance, tau_c might represent a characteristic time for the onset of a process (like bubble coalescence or growth on the electrode), while tau_b might represent the detachment time or another slower process.
+//c_AB = 4: This is a mixing constant that might be related to the effective contact area or the dynamics of the bubble’s contact angle (the comment suggests an equivalent contact angle of around 9°).
+//The parameter influences how species concentration differences (i.e., driving forces for mass transfer) are modulated at the interface.
+//K_DB = 0 and K_AB = 0: These coefficients (for detached bubble (DB) and attached bubble (AB) processes) are set to zero, which may indicate that any additional kinetic resistances or enhancements in the bubble growth model are currently neglected.
+//R_DB = $RDB: This parameter is set using a predefined variable or macro ($RDB). It likely represents a characteristic radius or a rate parameter for detached bubble dynamics. Its actual value should be defined elsewhere in your configuration.
+//Mixing Constant a = 1: At the end, this constant is used in a mixing model (possibly in a term like 𝑎(𝐶−𝐶𝑠𝑎𝑡)a(C−Csat )), which determines how deviations from saturation drive mass transfer. Setting it to 1 makes the mixing response directly proportional to the concentration difference.
+
+
+tau_c	0.01;
+tau_b	0.1;
+c_AB	4; // 4 (or 163 in another commented version); angle=9deg
+K_DB	0;
+K_AB	0;
+R_DB	$RDB;
+a	1; // mixing constant (a*C - C_sat)
+}
+
+
+
+
+relativeVelocityModel combinedDiffusion;//viscousRegime;//simpleIshii;//
+
+"(simple|general|pSimple|distorted|viscousRegime)Coeffs"
+{
+    V0              (1e-9 0 0);
+    a               -1;//-0.2;
+    a1              0;
+    residualAlpha   0;
+}
+"(distorted|viscousRegime)Coeffs"
+{
+
+    R_DB	$RDB;
+    SurfaceTension 80e-3;
+    D		5e-7;
+}
+"(simpleIshii|simpleIshiiTEST)Coeffs"
+{
+    R_DB		$RDB;
+    n               	5;//2.4;
+    D			8;//1;
+    minAlpha		0.4;
+}
+"(Schillings)Coeffs"
+{
+    en			(0 1 0);//normal vector on g
+    em			(0 0 1);//normal vector on g and normal on en
+    D			1;//1;
+    n			1;
+    R_DB	$RDB;
+}
+"(combined|combinedDiffusion)Coeffs"
+{
+
+    rd_Ne		$RDB;
+    D_Ne_		8;
+    D_Ne			(#eval{$D_Ne_/8} 0 0
+    				 0 $D_Ne_ 0
+    				 0 0 $D_Ne_);//1;
+    CW_Ne			0.1;
+
+    rd_Pe		$RDB;
+    D_Pe_		8;
+    D_Pe			(#eval{$D_Pe_/8} 0 0
+    				 0 $D_Pe_ 0
+    				 0 0 $D_Pe_);//1;
+    CW_Pe			0.1;
+
+    dF			1; //dispersion scale. incresses bubble dispersion. value is a scale.
+    hF			0; //hindering. makes bubbles move slower in porouse media. value should be between 0 and 1.
+
+    n               	5;//2.4;
+    minAlphad		0.4;
+
+    y0			0;
+    y1			1.8e-3;
+    y2			#eval{1.8e-3+0.85e-3};
+    y3			#eval{1.8e-3*2+0.85e-3};
+
+
+}
+
+
+coverageModel linearVogt;
+
+"(linearCoverage|vogt|linearVogt|bubbleNeuclation|bubbleNeuclationLinear|zeroCoverage)Coeffs"
+{
+	//vogt
+	J_lim		300000.0;   ///ffrom vogt
+	J_scale		1;
+	Temperature_ref	298.15;
+	//bubbleNeuclation
+	alpha_b		0.524;	//contact angle in rad
+	tau_d		1;	//time scale of neuclation, to signify howmany bubbles are also growing at the same time
+	d_b		0.1e-3;	//bubble neucleation diameter
+	//bubbleNeucleationLinear
+
+	d_ba		15.006e-9;
+	d_bb		375.7e-6;
+
+	tau_da		9.76e-6;
+	tau_db		4.45;
+	n		1;	//power of linear coverage
+}
+
+concentrationLossModel constantRatio;
+
+"(constantRatio|fixedReferenceValue|localReference)Coeffs"
+{
+stoichiometricCoefficient true; //use stoichiometricCoefficient as exponent CR[i]^n.:=
+//used in "constantRatio"
+
+//used in "fixedReferenceValue"
+	C_ref_OH 	6851.19;
+	C_ref_H2O 	48810;
+	C_ref_H2 	1;
+	C_ref_O2 	1;
+	//exponent, CR[i]^n, all have to be specified, even when not truely used.
+	n_Ne_H2		1;
+	n_Ne_O2		1;
+	n_Ne_H2O	2;
+	n_Ne_OH		2;
+	a_Ne		("H2");
+	c_Ne		("H2O");
+
+
+	n_Pe_H2		1;
+	n_Pe_O2		0.5;
+	n_Pe_H2O	1;
+	n_Pe_OH		2;
+	a_Pe		("OH");
+	c_Pe		("O2");
+
+}
+
+
+
+
+
+
+p_num		101325;
+T0		298; //reference temperature
+mu_KOH		0.000581;	//extrapolated to 80C with data from from https://link.springer.com/content/pdf/10.1134/S0018151X20060127.pdf?pdf=button%20sticky (checked 23/01-2023)
+Re_p		6.32;
+
+//mole weight
+MW_H2		2.01588e-3;	//kg/mol
+MW_O2		31.9988e-3;	//kg/mol
+MW_OH		17.007e-3;	//kg/mol
+MW_H2O		18.01528e-3;	//kg/mol
+MW_K		39.10e-3;	//kg/mol
+
+// iterations to correct potentials and species
+potentialCorrections	5;
+speciesCorrections	2;
+
+//other
+n_Temp	0;
+
+// ************************************************************************* //

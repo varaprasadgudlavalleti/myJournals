@@ -1,0 +1,193 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      porosityProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//Start of Defining parametric variables //
+
+//Start of Defining parametric variables //
+
+H   30.0e-3;//cell HEIGHT in Y-direction
+W	30.0e-3;//cell WIDTH in Z-direction
+
+
+tp	1.5e-3; //thickness of positive electrode
+tdi	0.5e-3; //thickness of diaphragm
+tn	1.5e-3; //thickness of negative electrode
+
+z0	0;
+z1  30e-3;//cell depth in Z-direction
+
+
+//Start of cumulative thickness calculation for each layer//
+
+t1 #eval #{ $tp+$tdi #};//cumulative thickness of (positive electrode + di)
+t2 #eval #{ $t1+$tn #};//cumulative thickness of  (positive electrode + di +negative electrode)
+
+//End of cumulative thickness calculation for each layer//
+
+
+//**********************************************************************************************************************//
+PE_setvalue_poredensity						PE_set_PPI;
+PE_setvalue_poresize						PE_set_dp;
+PE_setvalue_tortuosity						PE_set_tau;
+PE_setvalue_specificsurfacearea 			PE_set_ssa;
+PE_setvalue_viscosity						PE_set_mu;
+PE_setvalue_porosity						PE_set_epsilon;
+PE_setvalue_permeability					PE_set_K;
+PE_setvalue_d								PE_set_darcy;
+PE_setvalue_porous_wire_dia					PE_set_wire_d;
+PE_setvalue_porouscell_spacing				PE_set_cellSpacing;
+PE_setvalue_esimatedsherwoodnumber			PE_set_sherwood;
+
+
+
+
+DI_setvalue_poredensity						DI_set_PPI;
+DI_setvalue_poresize						DI_set_dp;
+DI_setvalue_tortuosity						DI_set_tau;
+DI_setvalue_specificsurfacearea 			DI_set_ssa;
+DI_setvalue_viscosity						DI_set_mu;
+DI_setvalue_porosity						DI_set_epsilon;
+DI_setvalue_permeability					DI_set_K;
+DI_setvalue_d								DI_set_darcy;
+DI_setvalue_porous_wire_dia					DI_set_wire_d;
+DI_setvalue_porouscell_spacing				DI_set_cellSpacing;
+DI_setvalue_esimatedsherwoodnumber			DI_set_sherwood;
+
+
+
+NE_setvalue_poredensity						NE_set_PPI;
+NE_setvalue_poresize						NE_set_dp;
+NE_setvalue_tortuosity						NE_set_tau;
+NE_setvalue_specificsurfacearea 			NE_set_ssa;
+NE_setvalue_viscosity						NE_set_mu;
+NE_setvalue_porosity						NE_set_epsilon;
+NE_setvalue_permeability					NE_set_K;
+NE_setvalue_d								NE_set_darcy;
+NE_setvalue_porous_wire_dia					NE_set_wire_d;
+NE_setvalue_porouscell_spacing				NE_set_cellSpacing;
+NE_setvalue_esimatedsherwoodnumber			NE_set_sherwood;
+//**********************************************************************************************************************//
+
+
+
+
+
+
+
+
+
+KPex	$PE_setvalue_d;//for PE - eps 0.59 in setfieldsdict
+KPey	$PE_setvalue_d;
+KPez	$PE_setvalue_d;
+betaPex	0;
+betaPey	0;
+betaPez	0;
+
+
+KDIx	$DI_setvalue_d; //for DI - eps 0.59 in setfieldsdict
+KDIy	$DI_setvalue_d;
+KDIz	$DI_setvalue_d;
+betaDIx	0;
+betaDIy	0;
+betaDIz	0;
+
+
+
+KNex	$NE_setvalue_d;//for NE - eps 0.59 in setfieldsdict
+KNey	$NE_setvalue_d;
+KNez	$NE_setvalue_d;
+betaNex	0;
+betaNey	0;
+betaNez	0;
+
+
+
+porosity_PE
+{
+    type            explicitPorositySource;
+
+    explicitPorositySourceCoeffs
+    {
+        selectionMode   cellZone;
+        cellZone        PE;
+        type            DarcyForchheimer;
+
+        d   ($KPex $KPey $KPez);
+    	f   ($betaPex $betaPey $betaPez);
+
+    	coordinateSystem
+    	{
+        	origin  (0 0 0);
+        	e1      (1 0 0);
+        	e2      (0 1 0);
+    	}
+
+    }
+}
+
+
+
+
+
+porosity_DI
+{
+    type            explicitPorositySource;
+
+    explicitPorositySourceCoeffs
+    {
+        selectionMode   cellZone;
+        cellZone        DI;
+        type            DarcyForchheimer;
+
+        d   ($KDIx $KDIy $KDIz);
+    	f   ($betaDIx $betaDIy $betaDIz);
+
+    	coordinateSystem
+    	{
+        	origin  (0 0 0);
+        	e1      (1 0 0);
+        	e2      (0 1 0);
+    	}
+    }
+}
+
+
+
+porosity_NE
+{
+    type            explicitPorositySource;
+
+    explicitPorositySourceCoeffs
+    {
+        selectionMode   cellZone;
+        cellZone        NE;
+        type            DarcyForchheimer;
+
+        d   ($KNex $KNey $KNez);
+    	f   ($betaNex $betaNey $betaNez);
+
+    	coordinateSystem
+    	{
+        	origin  (0 0 0);
+        	e1      (1 0 0);
+        	e2      (0 1 0);
+    	}
+
+    }
+}
+
+
+// ************************************************************************* //

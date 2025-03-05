@@ -1,0 +1,159 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+application     currentTransport;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         50;
+
+deltaT          0.0005;
+
+writeControl    adjustableRunTime;//timeStep;
+
+writeInterval   5;//250;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression on;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep 	yes;
+maxCo 		1;
+maxDeltaT	0.05;
+
+
+//adjustTimeStep  yes;
+//maxCo         0.8;
+//maxDeltaT     1e-3;
+
+/*
+application     currentTransport;
+
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         50;
+
+
+//If you want variable time steps with limited deltaT changes
+adjustTimeStep 	yes;
+deltaT          0.0005;
+writeControl    adjustableRunTime; //timeStep; //runTIme;
+writeInterval   0.25;
+maxCo 			1;
+maxDeltaT		0.05;
+
+
+
+/*
+//If you want fixed time steps
+adjustTimeStep 	no;
+maxCo 			1;
+deltaT          0.0005;
+writeControl    runTime; //adjustableRunTime; //timeStep; //runTIme;
+writeInterval   0.25;
+maxDeltaT		0.05;
+*/
+
+
+/*
+//If you want fixed time steps
+adjustTimeStep no;
+maxCo          1.5;
+maxDeltaT      0.0005;
+writeControl   timeStep;
+writeInterval  1;
+maxDeltaT	0.05;
+*/
+
+/*
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression on;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+*/
+
+
+
+functions
+{
+	PWall_Ne
+	{
+	name    NE;
+	fields  (INe UNe);
+
+	operation areaAverage;
+
+	type            surfaceFieldValue;
+	libs            ("libfieldFunctionObjects.so");
+
+	writeControl    runTime;
+	//writeControl    timeStep;
+	writeInterval   0.25;
+
+	writeFields     false;
+	log             false;
+
+	regionType  patch;
+	}
+
+
+	PWall_Pe
+	{
+	name    PE;
+	fields  (IPe UPe);
+
+	operation areaAverage;
+
+	type            surfaceFieldValue;
+	libs            ("libfieldFunctionObjects.so");
+
+	writeControl    runTime;
+	//writeControl    timeStep;
+	writeInterval   0.25;
+
+	writeFields     false;
+	log             false;
+
+	regionType  patch;
+
+	}
+
+
+}
+// ************************************************************************* //

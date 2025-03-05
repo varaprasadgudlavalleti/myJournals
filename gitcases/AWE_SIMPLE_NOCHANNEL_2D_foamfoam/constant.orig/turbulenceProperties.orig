@@ -1,0 +1,57 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      turbulenceProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+simulationType      laminar;
+
+
+
+//RASModel – buoyantKEpsilon:
+//This specifies that the turbulence model being used is the buoyant k-epsilon model.
+//This variant of the standard k-epsilon model includes modifications to account for buoyancy effects.
+//Such effects are important in flows where density variations (often due to temperature or concentration differences) drive the motion.
+
+//turbulence on:
+//This flag explicitly turns on turbulence modeling.
+//Even though the simulation type is set to laminar, this parameter instructs the solver to include turbulence effects via the chosen RAS model.
+
+//printCoeffs on:
+//This setting directs the solver to print the turbulence model coefficients during the simulation.
+//This can be useful for debugging or verifying that the model parameters are correctly applied.
+
+
+
+//Cg:
+//This coefficient is specific to the buoyant k-epsilon model.
+//It generally appears in the buoyancy production term of the turbulence kinetic energy equation.
+//A value of 0.85 is within a typical range, but it may be adjusted based on experimental data or specific simulation requirements.
+
+
+RAS
+{
+    RASModel        buoyantKEpsilon;
+
+    turbulence      on;
+
+    printCoeffs     on;
+
+    buoyantKEpsilonCoeffs
+    {
+        Cg      0.85;
+    }
+}
+
+
+// ************************************************************************* //

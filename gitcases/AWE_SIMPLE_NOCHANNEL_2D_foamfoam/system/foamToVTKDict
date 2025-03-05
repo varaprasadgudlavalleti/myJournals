@@ -1,0 +1,13 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      foamToVTKDict;
+}
+
+// Enable cell zone export
+writeCellZones yes;
+writeZones yes;
+writeSets yes;
+writeBoundary yes;

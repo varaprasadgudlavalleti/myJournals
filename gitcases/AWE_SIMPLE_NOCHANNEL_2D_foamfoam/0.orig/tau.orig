@@ -1,0 +1,106 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+
+//**********************************************************************************************************************//
+PE_setvalue_poredensity						PE_set_PPI;
+PE_setvalue_poresize						PE_set_dp;
+PE_setvalue_tortuosity						PE_set_tau;
+PE_setvalue_specificsurfacearea 			PE_set_ssa;
+PE_setvalue_viscosity						PE_set_mu;
+PE_setvalue_porosity						PE_set_epsilon;
+PE_setvalue_permeability					PE_set_K;
+PE_setvalue_d								PE_set_darcy;
+PE_setvalue_porous_wire_dia					PE_set_wire_d;
+PE_setvalue_porouscell_spacing				PE_set_cellSpacing;
+PE_setvalue_esimatedsherwoodnumber			PE_set_sherwood;
+
+
+
+
+DI_setvalue_poredensity						DI_set_PPI;
+DI_setvalue_poresize						DI_set_dp;
+DI_setvalue_tortuosity						DI_set_tau;
+DI_setvalue_specificsurfacearea 			DI_set_ssa;
+DI_setvalue_viscosity						DI_set_mu;
+DI_setvalue_porosity						DI_set_epsilon;
+DI_setvalue_permeability					DI_set_K;
+DI_setvalue_d								DI_set_darcy;
+DI_setvalue_porous_wire_dia					DI_set_wire_d;
+DI_setvalue_porouscell_spacing				DI_set_cellSpacing;
+DI_setvalue_esimatedsherwoodnumber			DI_set_sherwood;
+
+
+
+NE_setvalue_poredensity						NE_set_PPI;
+NE_setvalue_poresize						NE_set_dp;
+NE_setvalue_tortuosity						NE_set_tau;
+NE_setvalue_specificsurfacearea 			NE_set_ssa;
+NE_setvalue_viscosity						NE_set_mu;
+NE_setvalue_porosity						NE_set_epsilon;
+NE_setvalue_permeability					NE_set_K;
+NE_setvalue_d								NE_set_darcy;
+NE_setvalue_porous_wire_dia					NE_set_wire_d;
+NE_setvalue_porouscell_spacing				NE_set_cellSpacing;
+NE_setvalue_esimatedsherwoodnumber			NE_set_sherwood;
+//**********************************************************************************************************************//
+
+
+dimensions      [0 0 0 0 0 0 0];
+
+//internalField   uniform 1.5;
+internalField   uniform $PE_setvalue_tortuosity;
+
+boundaryField
+{
+
+    PE
+    {
+        type            fixedValue;
+        value           uniform $PE_setvalue_tortuosity;
+    }
+    DI
+    {
+        type            fixedValue;
+        value           uniform $DI_setvalue_tortuosity;
+    }
+    NE
+    {
+        type            fixedValue;
+        value           uniform $NE_setvalue_tortuosity;
+    }
+
+    INLET
+    {
+        type            fixedValue;
+        value           uniform $NE_setvalue_tortuosity;
+    }
+    OUTLET
+    {
+        type            zeroGradient;
+    }
+
+    frontAndBack
+    {
+	type		empty;
+    }
+
+}
+
+
+
+// ************************************************************************* //

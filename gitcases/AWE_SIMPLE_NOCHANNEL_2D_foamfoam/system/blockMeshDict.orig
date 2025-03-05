@@ -1,0 +1,238 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2206                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+scale   1e-3;
+
+//Start of Defining parametric variables //
+
+H   	30.0;//cell HEIGHT in Y-direction
+W		30.0;//cell WIDTH in Z-direction
+
+
+tp		1.5; //thickness of positive electrode
+tdi		0.5; //thickness of diaphragm
+tn		1.5; //thickness of negative electrode
+tnfoam 	1.5;
+
+
+z0		0;
+z1  	30;//cell depth in Z-direction
+
+
+//Start of cumulative thickness calculation for each layer//
+
+t1 #eval #{ $tp+$tdi #};//cumulative thickness of (positive electrode + di)
+t2 #eval #{ $t1+$tn #};//cumulative thickness of  (positive electrode + di +negative electrode)
+t3 #eval #{ $t2+$tnfoam #};//cumulative thickness of  (positive electrode + di +negative electrode+negative electrode1)
+
+//End of cumulative thickness calculation for each layer//
+
+//End of Defining parametric variables //
+
+
+//Mesh calculations/
+Nz  1;
+
+
+//X-DIRECTION//
+// Number of cells
+N_p_X    		N_CELLS_POSITIVEELECTRODE_X;
+N_di_X    		N_CELLS_DIAPHRAGM_X;
+N_n_X    		N_CELLS_NEGATIVEELECTRODE_X;
+
+N_nfoam_X    	N_CELLS_NEGATIVEELECTRODE_X;
+
+// Expansion ratios from Calgrad python script of Allrun.py
+Ratio_p_X   		EXPANSION_RATIO_POSITIVEELECTRODE_X;
+Ratio_di_X   		EXPANSION_RATIO_DIAPHRAGM_X;
+Ratio_n_X  			EXPANSION_RATIO_NEGATIVEELECTRODE_X;
+
+Ratio_nfoam_X  		EXPANSION_RATIO_NEGATIVEELECTRODE_X;
+
+
+
+Ratio_p_X1   		#eval #{ $Ratio_p_X*5.0 #};
+Ratio_di_X1   		#eval #{ $Ratio_di_X*5.0 #};
+Ratio_n_X1  		#eval #{ $Ratio_n_X*5.0 #};
+
+Ratio_nfoam_X1  	#eval #{ $Ratio_n_X*5.0 #};
+
+//X-DIRECTION//
+
+
+
+
+//Y-DIRECTION//
+Ratio_all_Y 10;
+
+
+// Number of cells
+N_p_Y    		N_CELLS_POSITIVEELECTRODE_Y;
+N_di_Y    		N_CELLS_DIAPHRAGM_Y;
+N_n_Y    		N_CELLS_NEGATIVEELECTRODE_Y;
+
+N_nfoam_Y    	N_CELLS_NEGATIVEELECTRODE_Y;
+
+// Expansion ratios from Calgrad python script of Allrun.py
+Ratio_p_Y   		EXPANSION_RATIO_POSITIVEELECTRODE_Y;
+Ratio_di_Y   		EXPANSION_RATIO_DIAPHRAGM_Y;
+Ratio_n_Y  			EXPANSION_RATIO_NEGATIVEELECTRODE_Y;
+
+Ratio_nfoam_Y  		EXPANSION_RATIO_NEGATIVEELECTRODE_Y;
+
+//Y-DIRECTION//
+
+
+
+
+
+//vertices//
+
+vertices
+(
+    (0 0 $z0)		        							//0
+    ($tp 0 $z0)		        							//1
+    ($t1 0 $z0)		        							//2
+    ($t2 0 $z0)											//3
+    ($t2 $H $z0)										//4
+    ($t1 $H $z0)		        						//5
+    ($tp $H $z0)		        						//6
+    (0 $H $z0)		        							//7
+
+
+    (0 0 $z1)		        							//8
+    ($tp 0 $z1)		        							//9
+    ($t1 0 $z1)		        							//10
+    ($t2 0 $z1)											//11
+    ($t2 $H $z1)										//12
+    ($t1 $H $z1)		        						//13
+    ($tp $H $z1)		        						//14
+    (0 $H $z1)		        							//15
+
+
+    ($t3 0 $z0)											//16
+    ($t3 0 $z1)		        							//17
+    ($t3 $H $z1)		        						//18
+    ($t3 $H $z0)		        						//19
+
+);
+
+//vertices//
+
+blocks
+(
+	hex (0 1 6 7 8 9 14 15) 	PE 	($N_p_X $N_p_Y $Nz) 		simpleGrading (((0.5 0.5 $Ratio_p_X1)(0.5 0.5 #eval #{ 1/$Ratio_p_X1 #})) ((0.5 0.5 $Ratio_p_Y)(0.5 0.5 #eval #{ 1/$Ratio_p_Y #}))  1)												//Block-0
+	hex (1 2 5 6 9 10 13 14) 	DI	($N_di_X $N_di_Y $Nz) 		simpleGrading (((0.5 0.5 $Ratio_di_X1)(0.5 0.5 #eval #{ 1/$Ratio_di_X1 #})) ((0.5 0.5 $Ratio_di_Y)(0.5 0.5 #eval #{ 1/$Ratio_di_Y #}))  1)											//Block-1
+	hex (2 3 4 5 10 11 12 13) 	NE	($N_n_X $N_n_Y $Nz) 		simpleGrading (((0.5 0.5 $Ratio_n_X1)(0.5 0.5 #eval #{ 1/$Ratio_n_X1 #})) ((0.5 0.5 $Ratio_n_Y)(0.5 0.5 #eval #{ 1/$Ratio_n_Y #}))  1)												//Block-2
+
+//extra FOAM block
+	hex (3 16 19 4 11 17 18 12) NEfoam	($N_nfoam_X $N_nfoam_Y $Nz) simpleGrading (((0.5 0.5 $Ratio_nfoam_X1)(0.5 0.5 #eval #{ 1/$Ratio_nfoam_X1 #})) ((0.5 0.5 $Ratio_nfoam_Y)(0.5 0.5 #eval #{ 1/$Ratio_nfoam_Y #}))  1)								//Block-3
+);
+
+
+edges
+(
+);
+
+boundary
+(
+
+    PE
+    {
+        type wall;
+        faces
+        (
+	    (0 8 15 7)
+        );
+    }
+
+
+    DI
+    {
+        type wall;
+        faces
+        (
+            (1 2 10 9)
+            (6 5 13 14)
+        );
+    }
+
+
+    NE
+    {
+        type wall;
+        faces
+        (
+	    //(3 11 12 4)
+//extra FOAM block
+	    (16 17 18 19)
+        );
+    }
+
+
+    INLET
+    {
+        type patch;
+        faces
+        (
+            (0 1 9 8)
+            (2 3 11 10)
+
+//extra FOAM block
+            (3 16 17 11)
+
+        );
+    }
+
+
+    OUTLET
+    {
+        type patch;
+        faces
+        (
+
+            (7 6 14 15)
+            (5 4 12 13)
+
+//extra FOAM block
+            (4 19 18 12)
+
+        );
+    }
+    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (0 1 6 7)
+            (8 9 14 15)
+
+            (1 2 5 6)
+            (9 10 13 14)
+
+            (2 3 4 5)
+            (10 11 12 13)
+
+//extra FOAM block
+            (3 16 19 4)
+            (11 17 18 12)
+
+        );
+    }
+);
+
+
+// ************************************************************************* //

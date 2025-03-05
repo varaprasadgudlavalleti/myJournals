@@ -1,0 +1,57 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2206                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _76d719d1e6-20220624 OPENFOAM=2206 version=v2206
+Arch   : "LSB;label=32;scalar=64"
+Exec   : setFields
+Date   : Mar 05 2025
+Time   : 15:40:39
+Host   : d57087
+PID    : 68060
+I/O    : uncollated
+Case   : /home/au779625/mySource/myPostdoc_AU/case/simple_2D/nochannel_FOAM_FOAM/AWE_SIMPLE_NOCHANNEL_2D_foamfoam
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Reading setFieldsDict
+
+Setting field default values
+    Setting internal values of volScalarField Ne
+    Setting internal values of volScalarField Pe
+    Setting internal values of volScalarField Mem
+    Setting internal values of volScalarField eps
+    Setting internal values of volScalarField tau
+
+Setting field region values
+    Adding cells with centre within boxes 1((0 0 0) (0.0015 0.03 0.03))
+    Setting internal values of volScalarField eps
+    Adding cells with centre within boxes 1((0.0015 0 0) (0.002 0.03 0.03))
+    Setting internal values of volScalarField eps
+    Adding cells with centre within boxes 1((0.002 0 0) (0.0035 0.03 0.03))
+    Setting internal values of volScalarField eps
+    Adding cells with centre within boxes 1((0 0 0) (0.0015 0.03 0.03))
+    Setting internal values of volScalarField tau
+    Adding cells with centre within boxes 1((0.0015 0 0) (0.002 0.03 0.03))
+    Setting internal values of volScalarField tau
+    Adding cells with centre within boxes 1((0.002 0 0) (0.0035 0.03 0.03))
+    Setting internal values of volScalarField tau
+    Adding cells with centre within boxes 1((0 0 0) (0.0015 0.03 0.03))
+    Setting internal values of volScalarField Pe
+    Adding cells with centre within boxes 1((0.0015 0 0) (0.002 0.03 0.03))
+    Setting internal values of volScalarField Mem
+    Adding cells with centre within boxes 1((0.002 0 0) (0.0035 0.03 0.03))
+    Setting internal values of volScalarField Ne
+
+End
+
